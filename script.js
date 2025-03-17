@@ -1,5 +1,3 @@
-console.log("hello world");
-
 const createPlayer = function (name, symbol) {
   const movesMade = [];
 
@@ -16,31 +14,39 @@ function createGameBoard() {
   const placeMarker = (postition, symbol) => {
     if (board[postition] == null) {
       board[postition] = symbol;
+
       return true;
     } else {
-      console.log("Invalid move");
       return false;
     }
   };
 
+  const isTie = () => {
+    return board.every((tile) => tile !== null);
+  };
+
   const getBoard = () => board;
 
-  return { getBoard, placeMarker };
+  const setBoard = () => {};
+
+  return { getBoard, placeMarker, isTie, setBoard };
 }
 
 function createGame(playerOne, playerTwo, gameBoard) {
+  const cells = document.querySelectorAll(".gameBoard div");
   const WINNING_LINES = [
-    ["0", "1", "2"],
-    ["3", "4", "5"],
-    ["6", "7", "8"],
-    ["0", "3", "6"],
-    ["1", "4", "7"],
-    ["2", "5", "9"],
-    ["0", "4", "8"],
-    ["2", "4", "6"],
+    //rows
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    //columns
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 9],
+    //diagonals
+    [0, 4, 8],
+    [2, 4, 6],
   ];
-
-  let gameFinished = false;
 
   let currentPlayer = playerOne;
 
@@ -50,6 +56,9 @@ function createGame(playerOne, playerTwo, gameBoard) {
     WINNING_LINES.forEach((line) => {
       if (line.every((value) => playerMovesMade.includes(value))) {
         alert("congratulations you win " + player.name);
+        line.forEach((cell) => {
+          cells[cell].classList.add("winningCell");
+        });
         return true;
       }
     });
@@ -59,28 +68,31 @@ function createGame(playerOne, playerTwo, gameBoard) {
   const takeTurn = (blockSelected) => {
     const { name, symbol } = currentPlayer;
     if (gameBoard.placeMarker(blockSelected, symbol)) {
+      cells[blockSelected].textContent = symbol;
       currentPlayer.makeMove(blockSelected);
-      gameFinished = checkWinner(currentPlayer);
+      checkWinner(currentPlayer);
       currentPlayer = symbol == "X" ? playerTwo : playerOne;
     }
-    console.log(symbol == "X");
-
-    console.log(gameBoard.getBoard());
-    console.log(
-      `${currentPlayer.name} (${currentPlayer.symbol}) select a block to make a move in`
-    );
+    if (gameBoard.isTie()) {
+      alert("Game is a tie");
+    }
   };
 
-  return { takeTurn };
+  const startGame = () => {
+    cells.forEach((cell, index) => {
+      cell.addEventListener("click", () => {
+        takeTurn(index);
+      });
+    });
+  };
+
+  return { takeTurn, currentPlayer, startGame };
 }
 
 const playerOne = createPlayer("Murray", "X");
-const playerTwo = createPlayer("Conne", "O");
+const playerTwo = createPlayer("Connie", "O");
 
 const gameBoard = createGameBoard();
 
 const newGame = createGame(playerOne, playerTwo, gameBoard);
-
-console.log(
-  `${playerOne.name} (${playerOne.symbol}) select a block to make a move in`
-);
+newGame.startGame();

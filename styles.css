@@ -1,0 +1,17 @@
+.gameBoard {
+    display: grid;
+    grid-template-columns: repeat(3, 200px);
+    grid-template-rows: repeat(3, 200px);
+}
+
+.gameBoard div {
+    border: 1px solid black;
+}
+
+.gameBoard div:hover {
+    cursor: pointer;
+}
+
+.winningCell {
+    background-color: green;
+}
